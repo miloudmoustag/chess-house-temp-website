@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Contact — Chess House FST Béni Mellal</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟</text></svg>"/>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
 
@@ -86,13 +86,19 @@
         </div>
       </div>
 
-      <!-- FORM — handled by Netlify Forms -->
+      <!-- FORM — sends to Netlify Function → Supabase DB -->
       <div>
         <p class="eyebrow" style="margin-bottom:1.5rem;">Envoyer un message</p>
-        <form class="contact-form" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-          <input type="hidden" name="form-name" value="contact"/>
-          <div style="display:none;"><input name="bot-field"/></div>
 
+        <!-- Success / Error banners -->
+        <div id="form-success" style="display:none; background:#1a2e1a; border:1px solid #2d5a2d; border-radius:4px; padding:1rem 1.25rem; margin-bottom:1rem; font-size:0.9rem; color:#7ec87e;">
+          ✓ Message envoyé ! Nous vous répondrons dans les 24 heures.
+        </div>
+        <div id="form-error" style="display:none; background:#2e1a1a; border:1px solid #5a2d2d; border-radius:4px; padding:1rem 1.25rem; margin-bottom:1rem; font-size:0.9rem; color:#c87e7e;">
+          ✗ Une erreur s'est produite. Veuillez réessayer ou nous contacter par e-mail.
+        </div>
+
+        <form id="contact-form">
           <div class="form-group">
             <label class="form-label" for="name">Nom complet</label>
             <input class="form-input" type="text" id="name" name="name" placeholder="Votre nom" required/>
@@ -109,10 +115,57 @@
             <label class="form-label" for="message">Message</label>
             <textarea class="form-textarea" id="message" name="message" placeholder="Votre message…" required></textarea>
           </div>
-          <button type="submit" class="btn-primary" style="width:100%; margin-top:0.5rem;">Envoyer le message</button>
-          <p style="font-size:0.75rem; color:var(--faint); text-align:center; margin-top:0.75rem; max-width:none;">Nous répondons généralement dans les 24 heures.</p>
+          <button type="submit" id="submit-btn" class="btn-primary" style="width:100%; margin-top:0.5rem;">
+            Envoyer le message
+          </button>
+          <p style="font-size:0.75rem; color:var(--faint); text-align:center; margin-top:0.75rem; max-width:none;">
+            Nous répondons généralement dans les 24 heures.
+          </p>
         </form>
       </div>
+
+      <script>
+        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          const btn     = document.getElementById('submit-btn');
+          const success = document.getElementById('form-success');
+          const errBox  = document.getElementById('form-error');
+
+          // Loading state
+          btn.textContent = 'Envoi en cours…';
+          btn.disabled = true;
+          success.style.display = 'none';
+          errBox.style.display  = 'none';
+
+          const payload = {
+            name:    document.getElementById('name').value,
+            email:   document.getElementById('email').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value
+          };
+
+          try {
+            const res = await fetch('/.netlify/functions/contact', {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+              success.style.display = 'block';
+              this.reset();
+            } else {
+              errBox.style.display = 'block';
+            }
+          } catch {
+            errBox.style.display = 'block';
+          } finally {
+            btn.textContent = 'Envoyer le message';
+            btn.disabled = false;
+          }
+        });
+      </script>
     </div>
   </div>
 </section>
@@ -162,6 +215,6 @@
     </div>
   </div>
 </footer>
-<script src="main.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

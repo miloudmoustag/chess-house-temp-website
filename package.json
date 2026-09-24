@@ -1,0 +1,9 @@
+{
+  "name": "chess-house-website",
+  "version": "1.0.0",
+  "description": "Chess House Club Website — FST Béni Mellal",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}

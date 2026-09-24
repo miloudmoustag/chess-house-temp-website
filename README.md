@@ -1,8 +1,6 @@
 # ♟ Chess House — Site Web Officiel
 
-Site web officiel du **Club Chess House** — Faculté des Sciences et Techniques de Béni Mellal, Université Sultan Moulay Slimane.
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR_BADGE_ID/deploy-status)](https://app.netlify.com)
+Site web officiel du **Club Chess House** — FST Béni Mellal, Université Sultan Moulay Slimane.
 
 ---
 
@@ -10,84 +8,99 @@ Site web officiel du **Club Chess House** — Faculté des Sciences et Technique
 
 ```
 chess-house-website/
-├── index.html          → Page d'accueil
-├── about.html          → À propos du club
-├── activities.html     → Activités & programme
-├── events.html         → Événements & calendrier
-├── contact.html        → Formulaire de contact
-├── css/
-│   └── style.css       → Feuille de style principale
-├── js/
-│   └── main.js         → Scripts (menu, animations)
-├── assets/             → Images et ressources
-├── netlify.toml        → Configuration Netlify
-├── _redirects          → Règles de redirection
+├── index.html
+├── about.html
+├── activities.html
+├── events.html
+├── contact.html
+├── css/style.css
+├── js/main.js
+├── netlify/
+│   └── functions/
+│       └── contact.js     ← Backend API (Netlify Function)
+├── package.json           ← Dépendance Supabase
+├── netlify.toml
+├── _redirects
 └── README.md
 ```
 
 ---
 
+## 🗄️ Créer la base de données (Supabase)
+
+### Étape 1 — Créer un projet Supabase
+1. Aller sur **[supabase.com](https://supabase.com)** → **Start for free**
+2. Créer un compte (gratuit, pas de carte bancaire)
+3. Cliquer **New Project** → Choisir un nom (ex: `chess-house`) → **Create**
+4. Attendre ~2 minutes que le projet soit prêt
+
+### Étape 2 — Créer la table `messages`
+1. Dans le dashboard Supabase → cliquer **SQL Editor** (icône dans la barre gauche)
+2. Coller ce SQL et cliquer **Run** :
+
+```sql
+CREATE TABLE messages (
+  id         BIGSERIAL PRIMARY KEY,
+  name       TEXT        NOT NULL,
+  email      TEXT        NOT NULL,
+  subject    TEXT,
+  message    TEXT        NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+3. La table est créée ✅ — vous pouvez voir les messages dans **Table Editor → messages**
+
+### Étape 3 — Récupérer vos clés API
+1. Dans Supabase → **Project Settings** (icône engrenage) → **API**
+2. Copier ces deux valeurs :
+   - **Project URL** → ressemble à `https://xxxxxxxxxxxx.supabase.co`
+   - **service_role key** → commence par `eyJhbGci...` (section "Project API keys")
+
+---
+
+## 🔑 Ajouter les clés dans Netlify
+
+1. Aller dans votre dashboard Netlify → votre site
+2. **Site configuration** → **Environment variables** → **Add a variable**
+3. Ajouter ces deux variables :
+
+| Variable Name           | Value                                      |
+|-------------------------|--------------------------------------------|
+| `SUPABASE_URL`          | `https://xxxxxxxxxxxx.supabase.co`         |
+| `SUPABASE_SERVICE_KEY`  | `eyJhbGci...` (votre service_role key)     |
+
+4. Cliquer **Save** → puis **Deploys** → **Trigger deploy** pour redéployer ✅
+
+---
+
 ## 🚀 Déploiement sur Netlify
 
-### Méthode 1 — Glisser-déposer (la plus simple)
-1. Aller sur [netlify.com](https://netlify.com) et se connecter
-2. Faire glisser le dossier `chess-house-website/` sur le dashboard Netlify
-3. Le site est en ligne en moins de 30 secondes ✅
+### Méthode 1 — Via GitHub (recommandée)
+```bash
+git init
+git add .
+git commit -m "Initial commit — Chess House website"
+git remote add origin https://github.com/TON_USERNAME/chess-house-website.git
+git push -u origin main
+```
+Puis sur Netlify : **New site → Import from Git → GitHub → Deploy**
 
-### Méthode 2 — Via GitHub (recommandée)
-1. Créer un nouveau dépôt sur GitHub
-2. Pousser ce dossier :
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit — Chess House website"
-   git remote add origin https://github.com/TON_USERNAME/chess-house-website.git
-   git push -u origin main
-   ```
-3. Sur Netlify : **New site > Import from Git > GitHub**
-4. Sélectionner le dépôt → **Deploy site** ✅
-5. Chaque `git push` redéploie automatiquement le site
-
-### Domaine personnalisé (optionnel)
-Dans Netlify : **Domain settings > Add custom domain**
-Exemple : `chess-house-fstbm.netlify.app` (gratuit) ou votre propre domaine
+### Méthode 2 — Glisser-déposer
+Faire glisser le dossier sur **[app.netlify.com](https://app.netlify.com)**
 
 ---
 
-## 📬 Formulaire de contact
+## 📬 Voir les messages reçus
 
-Le formulaire dans `contact.html` utilise **Netlify Forms** (inclus gratuitement).
-- Les soumissions apparaissent dans : Netlify Dashboard → **Forms**
-- Activer les notifications e-mail dans : **Forms > Settings > Notifications**
-
----
-
-## ✏️ Modifier le contenu
-
-| Ce que vous voulez changer | Fichier à éditer |
-|---|---|
-| Texte de la page d'accueil | `index.html` |
-| Info sur les membres / bureau | `about.html` |
-| Liste des activités | `activities.html` |
-| Calendrier des événements | `events.html` |
-| Coordonnées / formulaire | `contact.html` |
-| Couleurs et typographie | `css/style.css` |
-| Menu mobile / animations | `js/main.js` |
-
----
-
-## 📱 Instagram
-
-Lier les posts Instagram : remplacer `@chess_house_fstbm` dans les fichiers HTML par le lien complet vers votre profil.
+Dans **Supabase → Table Editor → messages** — tous les messages du formulaire apparaissent ici en temps réel.
 
 ---
 
 ## 📞 Contact du club
 
-- **E-mail :** Chesshouse58@gmail.com  
-- **Tél :** 0634 262 883 (Miloud Moustage)  
+- **E-mail :** Chesshouse58@gmail.com
+- **Tél :** 0634 262 883
 - **Instagram :** [@chess_house_fstbm](https://instagram.com/chess_house_fstbm)
 
----
-
-*FST Béni Mellal — Université Sultan Moulay Slimane — Année universitaire 2025/2026*
+*FST Béni Mellal — Université Sultan Moulay Slimane — 2025/2026*
